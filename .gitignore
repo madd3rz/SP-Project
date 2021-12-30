@@ -1,3 +1,4 @@
 .vscode/launch.json
-supercommand.o
 .vscode/tasks.json
+*.o
+*.out
