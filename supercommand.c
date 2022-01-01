@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dirent.h>
 
 int getFileLength(int fd);
 
@@ -32,14 +33,11 @@ int main(int argc, char *argv[])
             close(fd);
         }
 
-        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "2") == 0)
+        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "2") == 0) // change file permission
         {
             fd = open(argv[3], O_RDWR);
-            // int p = atoi(argv[4]);
-            // printf("%d", p);
             unsigned long mode = strtoul(argv[4], NULL, 8);
             fchmod(fd, mode);
-            printf("%ld\n", mode);
 
             if (fd == -1)
             {
@@ -53,7 +51,7 @@ int main(int argc, char *argv[])
             close(fd);
         }
 
-        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "3") == 0)
+        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "3") == 0) // read from a given file and print to the standard output
         {
             int fd = open(argv[3],O_RDONLY); // open the source file with O_RDONLY permission 
             if(fd < 0){
@@ -69,7 +67,7 @@ int main(int argc, char *argv[])
             close(fd);                  // close fd
         }
 
-        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "4") == 0)
+        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "4") == 0) //remove or delete a file given the file name
         {
             char *filepath = argv[3];
             int status;
@@ -101,7 +99,8 @@ int main(int argc, char *argv[])
                 return 0;
             }
         }
-        else if (strcmp(argv[1], "2") == 0 && strcmp(argv[2], "2") == 0) // Remove directory
+
+        if (strcmp(argv[1], "2") == 0 && strcmp(argv[2], "2") == 0) // Remove directory
         {
             status = rmdir(argv[3]);
 
@@ -117,8 +116,35 @@ int main(int argc, char *argv[])
                 return 0;
             }
         }
+        
+        if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"3") == 0) // display current directory
+        {
+            char cwd[1024];  //current working directory 
 
-        if (strcmp(argv[1], "3") == 0)
+            if(getcwd(cwd, sizeof(cwd)) == NULL)
+			    perror("getcwd() error");
+		    else
+			    printf("current working directory is: %s\n\n", cwd);
+                return 0;
+        }
+        
+        if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"4") == 0) // display file in current directory
+        {
+            DIR* dir = opendir(".");
+            struct dirent* entity;
+
+			entity = readdir(dir);
+			printf("List of all files in current directory\n");
+			while(entity != NULL)
+			{
+				printf("%s\n",entity->d_name);
+				entity = readdir(dir);
+			}
+            closedir(dir);
+	        return 0; 
+        }
+        
+        if (strcmp(argv[1], "3") == 0) // execute other linux command
         {
             pid_t p;
             p = fork();
@@ -129,8 +155,6 @@ int main(int argc, char *argv[])
             }
             if (p == 0)
             {
-                /*TODO: 1. Fix the argv
-                        2. Need to kill the child process after done*/
                 execlp(argv[2], argv[2], argv[3], (char *)NULL);
             }
         }
