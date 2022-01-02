@@ -139,13 +139,6 @@ int main(int argc, char *argv[])
             closedir(dir);
 	        return 0; 
         }
-
-            if(getcwd(cwd, sizeof(cwd)) == NULL)
-			    perror("getcwd() error");
-		    else
-			    printf("current working directory is: %s\n\n", cwd);
-                return 0;
-        }
         
         if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"4") == 0) // display file in current directory
         {
