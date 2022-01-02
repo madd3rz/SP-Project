@@ -14,6 +14,9 @@ int main(int argc, char *argv[])
     int fd;
     char fname[100];
     int status; // status for directory
+    char cwd[1024];  //current working directory 
+    DIR* dir = opendir(".");
+    struct dirent* entity;
 
     if (argc > 1)
     {
@@ -116,10 +119,26 @@ int main(int argc, char *argv[])
                 return 0;
             }
         }
-        
-        if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"3") == 0) // display current directory
+        else if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"3") == 0) // display current directory
         {
-            char cwd[1024];  //current working directory 
+            if(getcwd(cwd, sizeof(cwd)) == NULL)
+			    perror("getcwd() error");
+		    else
+			    printf("current working directory is: %s\n\n", cwd);
+                return 0;
+        }
+        else if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"4") == 0) // display file in current directory
+        {
+			entity = readdir(dir);
+			printf("List of all files in current directory\n");
+			while(entity != NULL)
+			{
+				printf("%s\n",entity->d_name);
+				entity = readdir(dir);
+			}
+            closedir(dir);
+	        return 0; 
+        }
 
             if(getcwd(cwd, sizeof(cwd)) == NULL)
 			    perror("getcwd() error");
