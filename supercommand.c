@@ -8,6 +8,7 @@
 #include <dirent.h>
 
 int getFileLength(int fd);
+void printErrorMessage();
 
 int main(int argc, char *argv[])
 {
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
             close(fd);
         }
 
-        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "2") == 0) // change file permission
+        else if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "2") == 0) // change file permission
         {
             fd = open(argv[3], O_RDWR);
             unsigned long mode = strtoul(argv[4], NULL, 8);
@@ -54,7 +55,7 @@ int main(int argc, char *argv[])
             close(fd);
         }
 
-        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "3") == 0) // read from a given file and print to the standard output
+        else if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "3") == 0) // read from a given file and print to the standard output
         {
             int fd = open(argv[3],O_RDONLY); // open the source file with O_RDONLY permission 
             if(fd < 0){
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
             close(fd);                  // close fd
         }
 
-        if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "4") == 0) //remove or delete a file given the file name
+        else if (strcmp(argv[1], "1") == 0 && strcmp(argv[2], "4") == 0) //remove or delete a file given the file name
         {
             char *filepath = argv[3];
             int status;
@@ -80,12 +81,13 @@ int main(int argc, char *argv[])
             if (status <0 )
             {
                 perror("Error removing file!");
+                return 0;
             }
 
             fprintf(stdout, "%s successfully removed!\n", filepath);
         }
 
-        if (strcmp(argv[1], "2") == 0 && strcmp(argv[2], "1") == 0) // Create directory
+        else if (strcmp(argv[1], "2") == 0 && strcmp(argv[2], "1") == 0) // Create directory
         {
 
             status = mkdir(argv[3], S_IRWXU | S_IRWXG | S_IXOTH);
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (strcmp(argv[1], "2") == 0 && strcmp(argv[2], "2") == 0) // Remove directory
+        else if (strcmp(argv[1], "2") == 0 && strcmp(argv[2], "2") == 0) // Remove directory
         {
             status = rmdir(argv[3]);
 
@@ -119,6 +121,7 @@ int main(int argc, char *argv[])
                 return 0;
             }
         }
+
         else if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"3") == 0) // display current directory
         {
             if(getcwd(cwd, sizeof(cwd)) == NULL)
@@ -127,6 +130,7 @@ int main(int argc, char *argv[])
 			    printf("current working directory is: %s\n\n", cwd);
                 return 0;
         }
+        
         else if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"4") == 0) // display file in current directory
         {
 			entity = readdir(dir);
@@ -140,23 +144,7 @@ int main(int argc, char *argv[])
 	        return 0; 
         }
         
-        if(strcmp(argv[1],"2") == 0 && strcmp(argv[2],"4") == 0) // display file in current directory
-        {
-            DIR* dir = opendir(".");
-            struct dirent* entity;
-
-			entity = readdir(dir);
-			printf("List of all files in current directory\n");
-			while(entity != NULL)
-			{
-				printf("%s\n",entity->d_name);
-				entity = readdir(dir);
-			}
-            closedir(dir);
-	        return 0; 
-        }
-        
-        if (strcmp(argv[1], "3") == 0) // execute other linux command
+        else if (strcmp(argv[1], "3") == 0) // execute other linux command
         {
             pid_t p;
             p = fork();
@@ -170,6 +158,15 @@ int main(int argc, char *argv[])
                 execlp(argv[2], argv[2], argv[3], (char *)NULL);
             }
         }
+
+        else {
+            printErrorMessage();
+
+        }
+    } 
+    else 
+    {
+        printErrorMessage();
     }
 
     return 0;
@@ -184,4 +181,10 @@ int getFileLength(int fd){
     lseek(fd, 0, SEEK_SET); // return to beginning position of file after seek to EOF above
 
     return fileLength;
+}
+
+void printErrorMessage(){
+    printf("Please enter the correct command options.\n");
+    printf("Example : ./supercommand.o 1 1 newFile.txt\n");
+    printf("To see more about the available options for this command, type man ./supercommand.man\n");
 }
